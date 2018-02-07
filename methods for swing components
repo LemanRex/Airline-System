@@ -1,0 +1,116 @@
+ private void displayDepartureAirports()
+   {    
+      Collection<Airport>airports = airline.getAirports();
+      addFlightDepartureAirports.setListData(airports);
+      addFlightDepartureAirports.setSelectedIndex(0);
+      
+      
+   }
+
+   private void displayArrivalAirports()
+   {
+      Airport theAirport = (Airport)addFlightDepartureAirports.getSelectedValue();
+      Collection<Airport>airports = airline.getAirports();
+      airports.remove(theAirport);
+      addFlightArrivalAirports.setListData(airports);
+      addFlightArrivalAirports.setSelectedIndex(0);
+   }
+
+   private void resetFlightFields()
+   {
+      addFlightDateField.setText("");
+      addFlightCapacityField.setText("");
+
+   }
+
+   private boolean doAddFlight()
+   {
+      try
+     {
+         Airport theDepartureAirport = (Airport)addFlightDepartureAirports.getSelectedValue();
+         Airport theArrivalAirport = (Airport)addFlightArrivalAirports.getSelectedValue();
+         int theCapacity = Integer.parseInt(addFlightCapacityField.getText());
+         String dateString = addFlightDateField.getText();
+         M256Date theDate = new M256Date(dateString);
+         
+         if(theCapacity > 0)
+         {
+             Flight aFlight = airline.addFlight(theDate, theCapacity, theDepartureAirport, theArrivalAirport);
+             addFlightOutcomeArea.setText("New flight created with flight number " + aFlight);
+             return true;
+         }
+         else
+         {
+             addFlightOutcomeArea.setText("Error: Capacity must be greater than zero");
+             return false;
+         }
+     }
+     catch(NumberFormatException e)
+     {
+         addFlightOutcomeArea.setText("Error: Non-integer entered for capacity");
+     }
+     catch(ParseException e)
+     {
+      addFlightOutcomeArea.setText("Error: incorrect date format");   
+     }
+     
+      return true;
+   }
+
+private void displayFlightsPassengerNotBookedOn()
+   {
+     Passenger thePassenger = (Passenger)bookFlightPassengerList.getSelectedValue();
+     bookFlightFlightList.setListData(airline.getFlights());
+     bookFlightFlightList.setSelectedIndex(0);
+   }
+   
+   private void displayFlightDetails2()
+   {
+     Flight theFlight = (Flight)bookFlightFlightList.getSelectedValue();
+     bookFlightCapacityField.setText(String.valueOf(theFlight.getCapacity()));
+     bookFlightDateField.setText(String.valueOf(theFlight.getDate()));
+     bookFlightDepartureField.setText(String.valueOf(airline.getDepartureAirport(theFlight)));
+     bookFlightArrivalField.setText(String.valueOf(airline.getArrivalAirport(theFlight)));
+   }
+
+   private void doBookFlight()
+   {        
+      Flight theFlight = (Flight)bookFlightFlightList.getSelectedValue();
+      Passenger thePassenger = (Passenger)bookFlightPassengerList.getSelectedValue();
+      
+      if(airline.book(thePassenger, theFlight))
+      {
+          bookFlightOutcomeArea.setText("Passenger " + thePassenger.getName()
+          + "booked on flight " + theFlight.getFlightNumber());
+          displayFlightsPassengerNotBookedOn();
+      }
+      else
+      {
+          bookFlightOutcomeArea.setText("Error: flight " + theFlight.getFlightNumber()+ " is fully booked");
+      }
+              }
+              
+   
+   private void bookFlightScreenComponentShown(java.awt.event.ComponentEvent evt)                                                
+   {                                                    
+      displayPassengers2();
+      bookFlightOutcomeArea.setText("");
+   }      
+   
+    private void addFlightDepartureAirportsValueChanged(javax.swing.event.ListSelectionEvent evt) {                                                        
+        displayArrivalAirports();
+    }                                                       
+
+    private void addFlightScreenComponentShown(java.awt.event.ComponentEvent evt) {                                               
+        displayDepartureAirports();
+        addFlightOutcomeArea.setText("");
+        resetFlightFields();
+    }                                              
+
+    private void addFlightuttonActionPerformed(java.awt.event.ActionEvent evt) {                                               
+        doAddFlight();
+        resetFlightFields();
+        
+    }            
+    
+    
